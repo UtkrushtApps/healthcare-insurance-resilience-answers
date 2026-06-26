@@ -1,0 +1,56 @@
+server:
+  port: 8080
+  shutdown: graceful
+
+spring:
+  application:
+    name: healthcare-scheduling
+  lifecycle:
+    timeout-per-shutdown-phase: 20s
+  datasource:
+    url: jdbc:postgresql://postgres:5432/healthcare
+    username: app
+    password:
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 2
+      connection-timeout: 3000
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+    properties:
+      hibernate:
+        format_sql: false
+  jackson:
+    default-property-inclusion: non_null
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  endpoint:
+    health:
+      probes:
+        enabled: true
+
+logging:
+  level:
+    root: INFO
+    com.company: INFO
+  pattern:
+    level: "%5p [correlationId:%X{correlationId:-}]"
+
+app:
+  insurer:
+    base-url: http://localhost:8080/simulator/insurer
+    connect-timeout: 500ms
+    response-timeout: 1s
+    overall-timeout: 2500ms
+    max-attempts: 2
+    retry-backoff: 100ms
+    circuit-breaker-sliding-window-size: 6
+    circuit-breaker-minimum-number-of-calls: 3
+    circuit-breaker-failure-rate-threshold: 50
+    circuit-breaker-open-state-duration: 10s
